@@ -1,0 +1,49 @@
+<%= search_form_for @q do |f| %>
+  <%= f.label :guest_first_name_eq %>
+  <%= f.search_field :guest_first_name_eq %>
+
+  <%= f.label :guest_last_name_eq %>
+  <%= f.search_field :guest_last_name_eq %>
+
+  <%= f.submit %>
+<% end %>
+
+<br>
+<br>
+
+<table id="reservations" border="1" cellpadding="0" cellspacing="0" width="1400px">
+  <thead>
+  <tr>
+    <th>Reservation id</th>
+    <th>Reservation cancelled</th>
+    <th>Guest first name</th>
+    <th>Guest last name</th>
+    <th>Room number</th>
+    <th>Room code</th>
+    <th>Actions</th>
+  </tr>
+  </thead>
+
+  <tbody>
+  <% @reservations.each do |reservation| %>
+    <tr>
+      <td><%= reservation.id %></td>
+      <td><%= reservation.cancelled %></td>
+      <td><%= reservation.guest.first_name %></td>
+      <td><%= reservation.guest.last_name %></td>
+      <td><%= reservation.room.number %></td>
+      <td><%= reservation.room_lock_pin_code %></td>
+      <td>
+        <% if current_user.admin? %>
+          <% if reservation.room.lock_uuid.present? %>
+            <% if reservation.room_lock_pin_code.present? %>
+              <%= button_to 'Resend code', resend_admin_room_lock_pin_code_path(reservation.id), method: :put %>
+            <% end %>
+            <%= button_to 'Reset code', reset_admin_room_lock_pin_code_path(reservation.id), method: :put %>
+          <% end %>
+        <% end %>
+      </td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>
